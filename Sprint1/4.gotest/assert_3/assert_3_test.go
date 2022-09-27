@@ -8,17 +8,36 @@ import (
 
 func TestFamily_AddNew(t *testing.T) {
 	type newPerson struct {
-		p Person
 		r Relationship
+		p Person
 	}
-
 	tests := []struct {
 		name           string
 		existedMembers map[Relationship]Person
 		newPerson      newPerson
 		wantErr        bool
 	}{
-		{name: "add father",
+		{
+			name: "add father",
+			existedMembers: map[Relationship]Person{
+				Mother: {
+					FirstName: "Maria",
+					LastName:  "Popova",
+					Age:       36,
+				},
+			},
+			newPerson: newPerson{
+				r: Father,
+				p: Person{
+					FirstName: "Misha",
+					LastName:  "Popov",
+					Age:       42,
+				},
+			},
+			wantErr: false,
+		},
+
+		{name: "add father #",
 			existedMembers: map[Relationship]Person{
 				Mother: {
 					FirstName: "Marina",
@@ -36,21 +55,23 @@ func TestFamily_AddNew(t *testing.T) {
 			},
 			wantErr: false,
 		},
-		{name: "catch error",
+
+		{
+			name: "catch error",
 			existedMembers: map[Relationship]Person{
 				Father: {
-					FirstName: "Anton",
-					LastName:  "Palchikov",
-					Age:       22,
+					FirstName: "Misha",
+					LastName:  "Popov",
+					Age:       42,
 				},
 			},
 			newPerson: newPerson{
-				p: Person{
-					FirstName: "Bogdan",
-					LastName:  "Hmeknitskiy",
-					Age:       25,
-				},
 				r: Father,
+				p: Person{
+					FirstName: "Ken",
+					LastName:  "Gymsohn",
+					Age:       32,
+				},
 			},
 			wantErr: true,
 		},
@@ -66,6 +87,7 @@ func TestFamily_AddNew(t *testing.T) {
 				require.NoError(t, err)
 
 				assert.Contains(t, f.Members, test.newPerson.r)
+				return
 			}
 
 			assert.Error(t, err)
